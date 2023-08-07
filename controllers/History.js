@@ -14,7 +14,7 @@ const getHistory = async (req, res, next) => {
     // Group the attendance by month
     const attendanceByMonth = child.attendance.reduce((result, record) => {
       const dateParts = record.date.split("/");
-      const year = "20" + dateParts[2];
+      const year = dateParts[2];
       const monthName = new Date(
         year,
         parseInt(dateParts[1]) - 1

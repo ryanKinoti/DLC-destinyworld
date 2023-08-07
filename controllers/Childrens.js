@@ -1,9 +1,35 @@
 const Childrens = require("../Models/Childrens");
-const { formatDate } = require("../utils/FormatDate");
+const { formatDate, calculateAge } = require("../utils/FormatDate");
 //CREATE
 const createChildrens = async (req, res, next) => {
+  const age = calculateAge(req.body.DOB);
+  let category;
+
+  if (age <= 2) {
+    category = "Dazzlers";
+  } else if (age > 2 && age <= 4) {
+    category = "Dreamers";
+  } else if (age > 4 && age <= 6) {
+    category = "Dynamites";
+  } else if (age > 6 && age <= 8) {
+    category = "Discoverers";
+  } else if (age > 8 && age <= 10) {
+    category = "Doers";
+  }
+  const dataToSave = {
+    parentName: req.body.parentName,
+    parentContact: req.body.parentContact,
+    Relationship: req.body.Relationship,
+    childName: req.body.childName,
+    childGender: req.body.childGender,
+    DOB: req.body.DOB,
+    childCategory: category,
+    visitor: req.body.visitor,
+    fatherName: req.body.fatherName,
+    fatherContact: req.body.fatherContact,
+  };
   try {
-    const newChildrens = new Childrens(req.body);
+    const newChildrens = new Childrens(dataToSave);
     const savedChildrens = await newChildrens.save();
     res.status(200).json(savedChildrens);
   } catch (error) {

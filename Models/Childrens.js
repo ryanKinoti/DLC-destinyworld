@@ -20,6 +20,16 @@ const ChildrensSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    fatherName: {
+      type: String,
+      required: true,
+    },
+    fatherContact: {
+      type: String,
+      required: true,
+    },
+
     Relationship: {
       type: String,
       required: true,
@@ -30,11 +40,7 @@ const ChildrensSchema = new mongoose.Schema(
     },
     childCategory: {
       type: String,
-      required: true,
-    },
-    childAge: {
-      type: String,
-      required: true,
+      // required: true,
     },
     childGender: {
       type: String,
@@ -42,7 +48,12 @@ const ChildrensSchema = new mongoose.Schema(
     },
     DOB: {
       type: String,
+      required: true,
+    },
+    visitor: {
+      type: Boolean,
       // required: true,
+      default: false,
     },
     attendance: {
       type: [attendanceSchema],
