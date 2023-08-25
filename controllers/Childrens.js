@@ -2,7 +2,7 @@ const Childrens = require("../Models/Childrens");
 const { formatDate, calculateAge } = require("../utils/FormatDate");
 //CREATE
 const createChildrens = async (req, res, next) => {
-  const age = calculateAge(req.body.DOB);
+  let age = calculateAge(req.body.DOB);
   let category;
 
   if (age <= 2) {
