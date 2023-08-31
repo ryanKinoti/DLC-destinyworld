@@ -1,7 +1,9 @@
 const Childrens = require("../Models/Childrens");
+const { setCache, getCache } = require("../routeCache");
 const { formatDate, calculateAge } = require("../utils/FormatDate");
 //CREATE
 const createChildrens = async (req, res, next) => {
+  const key = "children";
   let age = calculateAge(req.body.DOB);
   let category;
 
@@ -31,6 +33,11 @@ const createChildrens = async (req, res, next) => {
   try {
     const newChildrens = new Childrens(dataToSave);
     const savedChildrens = await newChildrens.save();
+
+    const getAllChildrenss = await Childrens.find();
+    console.log(`Cache update new record for ${key}`);
+    setCache(key, JSON.stringify(getAllChildrenss));
+
     res.status(200).json(savedChildrens);
   } catch (error) {
     next(error);
@@ -39,6 +46,8 @@ const createChildrens = async (req, res, next) => {
 
 //UPDATE
 const updateChildrens = async (req, res, next) => {
+  const key = "children";
+  console.log("update url", key);
   const attendance = { date: formatDate(), present: req.body.present };
   try {
     const Childrenss = await Childrens.findById(req.params.id);
@@ -55,10 +64,14 @@ const updateChildrens = async (req, res, next) => {
         { _id: req.params.id, "attendance.date": formatDate() },
         { $set: { "attendance.$.present": attendance?.present } },
         { new: true },
-        (err, updatedDocument) => {
+        async (err, updatedDocument) => {
           if (err) next(err);
-          else if (updatedDocument) res.status(200).json(updatedDocument);
-          else next(err);
+          else if (updatedDocument) {
+            const getAllChildrenss = await Childrens.find();
+            console.log(`Cache update for ${key}`);
+            setCache(key, JSON.stringify(getAllChildrenss));
+            res.status(200).json(updatedDocument);
+          } else next(err);
         }
       );
     } else {
@@ -67,6 +80,9 @@ const updateChildrens = async (req, res, next) => {
         { $push: { attendance: attendance } },
         { new: true }
       );
+      const getAllChildrenss = await Childrens.find();
+      console.log(`Cache update for ${key}`);
+      setCache(key, JSON.stringify(getAllChildrenss));
       res.status(200).json(UpdatedChildrens);
     }
   } catch (error) {
@@ -95,16 +111,41 @@ const getChildrensById = async (req, res, next) => {
 
 //GET ALL SHOW ROOMS
 const getChildrens = async (req, res, next) => {
+  const key = "children";
   try {
-    const getAllChildrenss = await Childrens.find();
-    res.status(200).json(getAllChildrenss);
+    if (getCache(key)) {
+      console.log(`Cache hit for ${key}`);
+      res.status(200).json(JSON.parse(getCache(key)));
+    } else {
+      const getAllChildrenss = await Childrens.find();
+      console.log(`Cache miss for ${key}`);
+      setCache(key, JSON.stringify(getAllChildrenss));
+      res.status(200).json(getAllChildrenss);
+    }
   } catch (error) {
     next(error);
   }
 };
+
+// const fetchChildrens = async () => {
+//   console.log("fetching children");
+//   const key = "children";
+//   try {
+//     const getAllChildrenss = await Childrens.find();
+//     console.log("fetched children", getAllChildrenss);
+//     setCache(key, JSON.stringify(getAllChildrenss));
+//   } catch (error) {
+//     console.log(error);
+//   }
+
+//   setTimeout(fetchChildrens, 50000);
+// };
+// fetchChildrens();
 
 exports.createChildrens = createChildrens;
 exports.updateChildrens = updateChildrens;
 exports.deleteChildrens = deleteChildrens;
 exports.getChildrens = getChildrens;
 exports.getChildrensById = getChildrensById;
+
+// exports.fetchChildrens = fetchChildrens;
