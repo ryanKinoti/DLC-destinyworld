@@ -10,7 +10,6 @@ const getCache = (key) => {
 
 const setCache = (key, data) => {
   cache.set(key, data);
-  console.log("cache");
 };
 
 // setTimeout(() => {

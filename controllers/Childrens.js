@@ -4,8 +4,8 @@ const { formatDate, calculateAge } = require("../utils/FormatDate");
 //CREATE
 const createChildrens = async (req, res, next) => {
   const key = "children";
-  let age = calculateAge(req.body.DOB);
-  let category;
+  let age = req.body.DOB ? calculateAge(req.body.DOB) : null;
+  let category = null;
 
   if (age <= 2) {
     category = "Dazzlers";
@@ -35,7 +35,6 @@ const createChildrens = async (req, res, next) => {
     const savedChildrens = await newChildrens.save();
 
     const getAllChildrenss = await Childrens.find();
-    console.log(`Cache update new record for ${key}`);
     setCache(key, JSON.stringify(getAllChildrenss));
 
     res.status(200).json(savedChildrens);
@@ -44,10 +43,56 @@ const createChildrens = async (req, res, next) => {
   }
 };
 
+// upload excel
+const createChildrensExcell = async (req, res, next) => {
+  const key = "children";
+  await req?.body?.data?.map(async (child) => {
+    let age = child?.DOB ? calculateAge(child?.DOB) : null;
+    let category = null;
+
+    if (age <= 2) {
+      category = "Dazzlers";
+    } else if (age > 2 && age <= 4) {
+      category = "Dreamers";
+    } else if (age > 4 && age <= 6) {
+      category = "Dynamites";
+    } else if (age > 6 && age <= 8) {
+      category = "Discoverers";
+    } else if (age > 8 && age <= 10) {
+      category = "Doers";
+    }
+    const dataToSave = {
+      parentName: child?.MOTHER_NAME ? child?.MOTHER_NAME : "",
+      parentContact: child?.MOTHER_CONTACT ? child?.MOTHER_CONTACT : "",
+      Relationship: child?.RELATIONSHIP ? child?.RELATIONSHIP : "",
+      childName: child?.CHILD_NAME ? child?.CHILD_NAME : "",
+      childGender: child?.GENDER ? child?.GENDER : "",
+      DOB: child?.DOB ? child?.DOB : "",
+      childCategory: category,
+      visitor: false,
+      fatherName: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : "",
+      fatherContact: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : "",
+    };
+
+    try {
+      const newChildrens = new Childrens(dataToSave);
+      const savedChildrens = await newChildrens.save();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  try {
+    const getAllChildrenss = await Childrens.find();
+    setCache(key, JSON.stringify(getAllChildrenss));
+    res.status(200).json(getAllChildrenss);
+  } catch (error) {
+    next(error);
+  }
+};
 //UPDATE
 const updateChildrens = async (req, res, next) => {
   const key = "children";
-  console.log("update url", key);
   const attendance = { date: formatDate(), present: req.body.present };
   try {
     const Childrenss = await Childrens.findById(req.params.id);
@@ -68,7 +113,6 @@ const updateChildrens = async (req, res, next) => {
           if (err) next(err);
           else if (updatedDocument) {
             const getAllChildrenss = await Childrens.find();
-            console.log(`Cache update for ${key}`);
             setCache(key, JSON.stringify(getAllChildrenss));
             res.status(200).json(updatedDocument);
           } else next(err);
@@ -81,7 +125,6 @@ const updateChildrens = async (req, res, next) => {
         { new: true }
       );
       const getAllChildrenss = await Childrens.find();
-      console.log(`Cache update for ${key}`);
       setCache(key, JSON.stringify(getAllChildrenss));
       res.status(200).json(UpdatedChildrens);
     }
@@ -114,11 +157,10 @@ const getChildrens = async (req, res, next) => {
   const key = "children";
   try {
     if (getCache(key)) {
-      console.log(`Cache hit for ${key}`);
       res.status(200).json(JSON.parse(getCache(key)));
     } else {
       const getAllChildrenss = await Childrens.find();
-      console.log(`Cache miss for ${key}`);
+
       setCache(key, JSON.stringify(getAllChildrenss));
       res.status(200).json(getAllChildrenss);
     }
@@ -147,5 +189,6 @@ exports.updateChildrens = updateChildrens;
 exports.deleteChildrens = deleteChildrens;
 exports.getChildrens = getChildrens;
 exports.getChildrensById = getChildrensById;
+exports.createChildrensExcell = createChildrensExcell;
 
 // exports.fetchChildrens = fetchChildrens;

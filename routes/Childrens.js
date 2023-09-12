@@ -6,6 +6,7 @@ const {
   deleteChildrens,
   getChildrensById,
   getChildrens,
+  createChildrensExcell,
 } = require("../controllers/Childrens");
 const route = express.Router();
 const { isAdmin } = require("../utils/verifyToken");
@@ -25,5 +26,8 @@ route.get("/:id", getChildrensById);
 //GET ALL
 
 route.get("/", getChildrens);
+//ulpoad excell
+
+route.post("/xlsx", createChildrensExcell);
 
 module.exports = route;

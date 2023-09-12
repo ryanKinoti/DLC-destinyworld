@@ -14,29 +14,29 @@ const ChildrensSchema = new mongoose.Schema(
   {
     parentName: {
       type: String,
-      required: true,
+      // required: true,
     },
     parentContact: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     fatherName: {
       type: String,
-      required: true,
+      // required: true,
     },
     fatherContact: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     Relationship: {
       type: String,
-      required: true,
+      // required: true,
     },
     childName: {
       type: String,
-      required: true,
+      // required: true,
     },
     childCategory: {
       type: String,
@@ -44,11 +44,11 @@ const ChildrensSchema = new mongoose.Schema(
     },
     childGender: {
       type: String,
-      required: true,
+      // required: true,
     },
     DOB: {
       type: String,
-      required: true,
+      // required: true,
     },
     visitor: {
       type: Boolean,
