@@ -7,6 +7,7 @@ const {
   getChildrensById,
   getChildrens,
   createChildrensExcell,
+  updateChild,
 } = require("../controllers/Childrens");
 const route = express.Router();
 const { isAdmin } = require("../utils/verifyToken");
@@ -18,6 +19,7 @@ route.post("/", createChildrens);
 //UPDATE
 // isAdmin,
 route.put("/:id", updateChildrens);
+route.put("/child/:id", updateChild);
 //DELETE
 //isAdmin,
 route.delete("/:id", deleteChildrens);

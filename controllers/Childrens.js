@@ -62,16 +62,16 @@ const createChildrensExcell = async (req, res, next) => {
       category = "Doers";
     }
     const dataToSave = {
-      parentName: child?.MOTHER_NAME ? child?.MOTHER_NAME : "",
-      parentContact: child?.MOTHER_CONTACT ? child?.MOTHER_CONTACT : "",
-      Relationship: child?.RELATIONSHIP ? child?.RELATIONSHIP : "",
-      childName: child?.CHILD_NAME ? child?.CHILD_NAME : "",
-      childGender: child?.GENDER ? child?.GENDER : "",
-      DOB: child?.DOB ? child?.DOB : "",
+      parentName: child?.MOTHER_NAME ? child?.MOTHER_NAME : null,
+      parentContact: child?.MOTHER_CONTACT ? child?.MOTHER_CONTACT : null,
+      Relationship: child?.RELATIONSHIP ? child?.RELATIONSHIP : null,
+      childName: child?.CHILD_NAME ? child?.CHILD_NAME : null,
+      childGender: child?.GENDER ? child?.GENDER : null,
+      DOB: child?.DOB ? child?.DOB : null,
       childCategory: category,
       visitor: false,
-      fatherName: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : "",
-      fatherContact: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : "",
+      fatherName: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
+      fatherContact: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
     };
 
     try {
@@ -132,10 +132,55 @@ const updateChildrens = async (req, res, next) => {
     next(error);
   }
 };
+const updateChild = async (req, res, next) => {
+  const key = "children";
+  try {
+    let age = req.body?.DOB ? calculateAge(req.body.DOB) : null;
+    let category = null;
+
+    if (age <= 2) {
+      category = "Dazzlers";
+    } else if (age > 2 && age <= 4) {
+      category = "Dreamers";
+    } else if (age > 4 && age <= 6) {
+      category = "Dynamites";
+    } else if (age > 6 && age <= 8) {
+      category = "Discoverers";
+    } else if (age > 8 && age <= 10) {
+      category = "Doers";
+    }
+    const dataToSave = {
+      parentName: req.body.parentName,
+      parentContact: req.body.parentContact,
+      Relationship: req.body.Relationship,
+      childName: req.body.childName,
+      childGender: req.body.childGender,
+      DOB: req.body.DOB,
+      childCategory: category,
+      visitor: req.body.visitor,
+      fatherName: req.body.fatherName,
+      fatherContact: req.body.fatherContact,
+    };
+
+    const UpdatedChild = await Childrens.findByIdAndUpdate(
+      req.params.id,
+      { $set: dataToSave },
+      { new: true }
+    );
+    const getAllChildrenss = await Childrens.find();
+    setCache(key, JSON.stringify(getAllChildrenss));
+    res.status(200).json(UpdatedChild);
+  } catch (error) {
+    next(error);
+  }
+};
 //DELETE SHOW ROOM BY ID
 const deleteChildrens = async (req, res, next) => {
+  const key = "children";
   try {
     await Childrens.findByIdAndDelete(req.params.id);
+    const getAllChildrenss = await Childrens.find();
+    setCache(key, JSON.stringify(getAllChildrenss));
     res.status(200).json({ message: "the collection has been deleted" });
   } catch (error) {
     next(error);
@@ -190,5 +235,4 @@ exports.deleteChildrens = deleteChildrens;
 exports.getChildrens = getChildrens;
 exports.getChildrensById = getChildrensById;
 exports.createChildrensExcell = createChildrensExcell;
-
-// exports.fetchChildrens = fetchChildrens;
+exports.updateChild = updateChild;
