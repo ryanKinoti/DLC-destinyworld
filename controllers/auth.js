@@ -11,6 +11,7 @@ const newUser = async (req, res, next) => {
     const newUser = await User({
       userName: req.body.userName,
       userEmail: req.body.userEmail,
+      userRights: req.body.userRights ? 1 : 0,
       password: hash,
       // isAdmin: req.body.isAdmin,
       // profile: req.body.profile,
@@ -26,7 +27,8 @@ const newUser = async (req, res, next) => {
     //   process.env.key
     // );
 
-    const { password, isAdmin, ...other } = newUser._doc;
+    const { password, _id, createdAt, updatedAt, userEmail, ...other } =
+      newUser._doc;
     // req.actoken = token
 
     res
@@ -63,7 +65,8 @@ const login = async (req, res, next) => {
     //   process.env.key
     // );
 
-    const { password, isAdmin, ...other } = checkUser._doc;
+    const { password, _id, createdAt, updatedAt, userEmail, ...other } =
+      checkUser._doc;
     // req.actoken = token;
 
     res
