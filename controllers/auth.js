@@ -11,7 +11,12 @@ const newUser = async (req, res, next) => {
     const newUser = await User({
       userName: req.body.userName,
       userEmail: req.body.userEmail,
-      userRights: req.body.userRights ? 1 : 0,
+      userRights:
+        req.body.userRights === "parent"
+          ? 3
+          : req.body.userRights === "superuser"
+          ? 1
+          : 0,
       password: hash,
       // isAdmin: req.body.isAdmin,
       // profile: req.body.profile,
