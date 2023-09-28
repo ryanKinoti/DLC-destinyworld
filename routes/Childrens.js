@@ -8,6 +8,8 @@ const {
   getChildrens,
   createChildrensExcell,
   updateChild,
+  getByChildName,
+  getStats,
 } = require("../controllers/Childrens");
 const route = express.Router();
 const { isAdmin } = require("../utils/verifyToken");
@@ -29,7 +31,10 @@ route.get("/:id", getChildrensById);
 
 route.get("/", getChildrens);
 //ulpoad excell
-
 route.post("/xlsx", createChildrensExcell);
+//search by child name
+route.get("/child/:name", getByChildName);
+//get stats
+route.get("/stats/child", getStats);
 
 module.exports = route;

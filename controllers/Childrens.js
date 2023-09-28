@@ -1,6 +1,9 @@
+const mongoose = require("mongoose");
 const Childrens = require("../Models/Childrens");
+const Parents = require("../Models/Parents");
 const { setCache, getCache } = require("../routeCache");
 const { formatDate, calculateAge } = require("../utils/FormatDate");
+const ObjectId = mongoose.Types.ObjectId;
 //CREATE
 const createChildrens = async (req, res, next) => {
   const key = "children";
@@ -18,25 +21,38 @@ const createChildrens = async (req, res, next) => {
   } else if (age > 8 && age <= 10) {
     category = "Doers";
   }
-  const dataToSave = {
-    parentName: req.body.parentName,
-    parentContact: req.body.parentContact,
-    Relationship: req.body.Relationship,
-    childName: req.body.childName,
-    childGender: req.body.childGender,
-    DOB: req.body.DOB,
-    childCategory: category,
-    visitor: req.body.visitor,
-    fatherName: req.body.fatherName,
-    fatherContact: req.body.fatherContact,
-  };
+
   try {
+    const parents = {
+      parentName: req.body.parentName,
+      parentContact: req.body.parentContact,
+      Relationship: req.body.Relationship,
+      fatherName: req.body.fatherName,
+      fatherContact: req.body.fatherContact,
+    };
+    const newParents = new Parents(parents);
+    const savedParents = await newParents.save();
+
+    const dataToSave = {
+      childName: req.body.childName,
+      childGender: req.body.childGender,
+      DOB: req.body.DOB,
+      childCategory: category,
+      visitor: req.body.visitor,
+      ParentsId: savedParents.id,
+    };
     const newChildrens = new Childrens(dataToSave);
     const savedChildrens = await newChildrens.save();
 
-    const getAllChildrenss = await Childrens.find();
-    setCache(key, JSON.stringify(getAllChildrenss));
+    // const UpdatedChild = await Childrens.findByIdAndUpdate(
+    //   savedChildrens.id,
+    //   { Parents: savedParents.id },
+    //   { new: true }
+    // );
 
+    // const getAllChildrenss = await Childrens.find();
+    // setCache(key, JSON.stringify(getAllChildrenss));
+    // getChildrenAndParents();
     res.status(200).json(savedChildrens);
   } catch (error) {
     next(error);
@@ -61,19 +77,26 @@ const createChildrensExcell = async (req, res, next) => {
     } else if (age > 8 && age <= 10) {
       category = "Doers";
     }
-    const dataToSave = {
+
+    const parents = {
       parentName: child?.MOTHER_NAME ? child?.MOTHER_NAME : null,
       parentContact: child?.MOTHER_CONTACT ? child?.MOTHER_CONTACT : null,
       Relationship: child?.RELATIONSHIP ? child?.RELATIONSHIP : null,
+      fatherName: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
+      fatherContact: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
+    };
+
+    const newParents = new Parents(parents);
+    const savedParents = await newParents.save();
+
+    const dataToSave = {
       childName: child?.CHILD_NAME ? child?.CHILD_NAME : null,
       childGender: child?.GENDER ? child?.GENDER : null,
       DOB: child?.DOB ? child?.DOB : null,
       childCategory: category,
       visitor: false,
-      fatherName: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
-      fatherContact: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
+      ParentsId: savedParents?.id,
     };
-
     try {
       const newChildrens = new Childrens(dataToSave);
       const savedChildrens = await newChildrens.save();
@@ -83,9 +106,8 @@ const createChildrensExcell = async (req, res, next) => {
   });
 
   try {
-    const getAllChildrenss = await Childrens.find();
-    setCache(key, JSON.stringify(getAllChildrenss));
-    res.status(200).json(getAllChildrenss);
+    // getChildrenAndParents();
+    res.status(200).json({ message: "added" });
   } catch (error) {
     next(error);
   }
@@ -112,8 +134,7 @@ const updateChildrens = async (req, res, next) => {
         async (err, updatedDocument) => {
           if (err) next(err);
           else if (updatedDocument) {
-            const getAllChildrenss = await Childrens.find();
-            setCache(key, JSON.stringify(getAllChildrenss));
+            // getChildrenAndParents();
             res.status(200).json(updatedDocument);
           } else next(err);
         }
@@ -124,8 +145,7 @@ const updateChildrens = async (req, res, next) => {
         { $push: { attendance: attendance } },
         { new: true }
       );
-      const getAllChildrenss = await Childrens.find();
-      setCache(key, JSON.stringify(getAllChildrenss));
+      // getChildrenAndParents();
       res.status(200).json(UpdatedChildrens);
     }
   } catch (error) {
@@ -150,25 +170,32 @@ const updateChild = async (req, res, next) => {
       category = "Doers";
     }
     const dataToSave = {
-      parentName: req.body.parentName,
-      parentContact: req.body.parentContact,
-      Relationship: req.body.Relationship,
-      childName: req.body.childName,
-      childGender: req.body.childGender,
-      DOB: req.body.DOB,
+      childName: req?.body?.childName,
+      childGender: req?.body?.childGender,
+      DOB: req?.body?.DOB,
       childCategory: category,
-      visitor: req.body.visitor,
-      fatherName: req.body.fatherName,
-      fatherContact: req.body.fatherContact,
+      visitor: req?.body?.visitor,
+    };
+    const parents = {
+      parentName: req?.body?.parentName,
+      parentContact: req?.body?.parentContact,
+      Relationship: req?.body?.Relationship,
+      fatherName: req?.body?.fatherName,
+      fatherContact: req?.body?.fatherContact,
     };
 
-    const UpdatedChild = await Childrens.findByIdAndUpdate(
+    const child = await Childrens.findByIdAndUpdate(
       req.params.id,
       { $set: dataToSave },
       { new: true }
     );
-    const getAllChildrenss = await Childrens.find();
-    setCache(key, JSON.stringify(getAllChildrenss));
+
+    const UpdatedChild = await Parents.findByIdAndUpdate(
+      child?.ParentsId,
+      { $set: parents },
+      { new: true }
+    );
+    // getChildrenAndParents();
     res.status(200).json(UpdatedChild);
   } catch (error) {
     next(error);
@@ -179,8 +206,7 @@ const deleteChildrens = async (req, res, next) => {
   const key = "children";
   try {
     await Childrens.findByIdAndDelete(req.params.id);
-    const getAllChildrenss = await Childrens.find();
-    setCache(key, JSON.stringify(getAllChildrenss));
+    // getChildrenAndParents();
     res.status(200).json({ message: "the collection has been deleted" });
   } catch (error) {
     next(error);
@@ -190,8 +216,89 @@ const deleteChildrens = async (req, res, next) => {
 //GET SHOW ROOM BY ID
 const getChildrensById = async (req, res, next) => {
   try {
-    const Childrenss = await Childrens.findById(req.params.id);
-    res.status(200).json(Childrenss);
+    const children = await Childrens.aggregate([
+      {
+        $match: {
+          _id: ObjectId(req?.params?.id),
+        },
+      },
+      {
+        $lookup: {
+          from: "parents",
+          localField: "ParentsId",
+          foreignField: "_id",
+          as: "parents",
+        },
+      },
+      {
+        $unwind: "$parents",
+      },
+      {
+        $project: {
+          _id: "$_id",
+          childName: "$childName",
+          childCategory: "$childCategory",
+          childGender: "$childGender",
+          DOB: "$DOB",
+          visitor: "$visitor",
+          ParentsId: "$ParentsId",
+          attendance: "$attendance",
+          parentName: "$parents.parentName",
+          parentContact: "$parents.parentContact",
+          fatherName: "$parents.fatherName",
+          fatherContact: "$parents.fatherContact",
+          Relationship: "$parents.Relationship",
+        },
+      },
+    ]);
+    res.status(200).json(children);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//search by childname
+const getByChildName = async (req, res, next) => {
+  try {
+    const children = await Childrens.aggregate([
+      {
+        $match: {
+          childName: {
+            $regex: req?.params?.name,
+            $options: "i",
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "parents",
+          localField: "ParentsId",
+          foreignField: "_id",
+          as: "parents",
+        },
+      },
+      {
+        $unwind: "$parents",
+      },
+      {
+        $project: {
+          _id: "$_id",
+          childName: "$childName",
+          childCategory: "$childCategory",
+          childGender: "$childGender",
+          DOB: "$DOB",
+          visitor: "$visitor",
+          ParentsId: "$ParentsId",
+          attendance: "$attendance",
+          parentName: "$parents.parentName",
+          parentContact: "$parents.parentContact",
+          fatherName: "$parents.fatherName",
+          fatherContact: "$parents.fatherContact",
+          Relationship: "$parents.Relationship",
+        },
+      },
+    ]);
+    res.status(200).json(children);
   } catch (error) {
     next(error);
   }
@@ -199,35 +306,89 @@ const getChildrensById = async (req, res, next) => {
 
 //GET ALL SHOW ROOMS
 const getChildrens = async (req, res, next) => {
-  const key = "children";
   try {
-    if (getCache(key)) {
-      res.status(200).json(JSON.parse(getCache(key)));
-    } else {
-      const getAllChildrenss = await Childrens.find();
-
-      setCache(key, JSON.stringify(getAllChildrenss));
-      res.status(200).json(getAllChildrenss);
-    }
+    let page = parseInt(req.query.p) || 1;
+    let childrenPerPage = parseInt(req.query.limit) || 5;
+    let skip = (page - 1) * childrenPerPage;
+    const children = await Childrens.aggregate([
+      {
+        $lookup: {
+          from: "parents",
+          localField: "ParentsId",
+          foreignField: "_id",
+          as: "parents",
+        },
+      },
+      {
+        $unwind: "$parents",
+      },
+      {
+        $skip: skip,
+      },
+      { $limit: childrenPerPage },
+      {
+        $project: {
+          _id: "$_id",
+          childName: "$childName",
+          childCategory: "$childCategory",
+          childGender: "$childGender",
+          DOB: "$DOB",
+          visitor: "$visitor",
+          ParentsId: "$ParentsId",
+          attendance: "$attendance",
+          parentName: "$parents.parentName",
+          parentContact: "$parents.parentContact",
+          fatherName: "$parents.fatherName",
+          fatherContact: "$parents.fatherContact",
+          Relationship: "$parents.Relationship",
+        },
+      },
+    ]);
+    res.status(200).json(children);
   } catch (error) {
     next(error);
   }
 };
 
-// const fetchChildrens = async () => {
-//   console.log("fetching children");
-//   const key = "children";
-//   try {
-//     const getAllChildrenss = await Childrens.find();
-//     console.log("fetched children", getAllChildrenss);
-//     setCache(key, JSON.stringify(getAllChildrenss));
-//   } catch (error) {
-//     console.log(error);
-//   }
-
-//   setTimeout(fetchChildrens, 50000);
-// };
-// fetchChildrens();
+//get totals
+const getStats = async (req, res, next) => {
+  try {
+    const children = await Childrens.aggregate([
+      {
+        $lookup: {
+          from: "parents",
+          localField: "ParentsId",
+          foreignField: "_id",
+          as: "parents",
+        },
+      },
+      {
+        $unwind: "$parents",
+      },
+      {
+        $project: {
+          _id: "$_id",
+          childName: "$childName",
+          childCategory: "$childCategory",
+          childGender: "$childGender",
+          DOB: "$DOB",
+          visitor: "$visitor",
+          ParentsId: "$ParentsId",
+          attendance: "$attendance",
+          parentName: "$parents.parentName",
+          parentContact: "$parents.parentContact",
+          fatherName: "$parents.fatherName",
+          fatherContact: "$parents.fatherContact",
+          Relationship: "$parents.Relationship",
+        },
+      },
+    ]);
+    res.status(200).json(children);
+  } catch (error) {
+    console.log("stats", error);
+    next(error);
+  }
+};
 
 exports.createChildrens = createChildrens;
 exports.updateChildrens = updateChildrens;
@@ -236,3 +397,5 @@ exports.getChildrens = getChildrens;
 exports.getChildrensById = getChildrensById;
 exports.createChildrensExcell = createChildrensExcell;
 exports.updateChild = updateChild;
+exports.getByChildName = getByChildName;
+exports.getStats = getStats;
