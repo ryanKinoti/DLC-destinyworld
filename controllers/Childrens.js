@@ -260,6 +260,10 @@ const getChildrensById = async (req, res, next) => {
 //search by childname
 const getByChildName = async (req, res, next) => {
   try {
+    let page = parseInt(req.query.p) || 1;
+    let childrenPerPage = parseInt(req.query.limit) || 5;
+    let skip = (page - 1) * childrenPerPage;
+
     const children = await Childrens.aggregate([
       {
         $match: {
@@ -280,6 +284,10 @@ const getByChildName = async (req, res, next) => {
       {
         $unwind: "$parents",
       },
+      {
+        $skip: skip,
+      },
+      { $limit: childrenPerPage },
       {
         $project: {
           _id: "$_id",
@@ -310,6 +318,7 @@ const getChildrens = async (req, res, next) => {
     let page = parseInt(req.query.p) || 1;
     let childrenPerPage = parseInt(req.query.limit) || 5;
     let skip = (page - 1) * childrenPerPage;
+
     const children = await Childrens.aggregate([
       {
         $lookup: {
