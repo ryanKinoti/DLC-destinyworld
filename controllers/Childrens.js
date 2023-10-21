@@ -14,11 +14,11 @@ const createChildrens = async (req, res, next) => {
     category = "Dazzlers";
   } else if (age > 2 && age <= 4) {
     category = "Dreamers";
-  } else if (age > 4 && age <= 6) {
+  } else if (age > 5 && age <= 6) {
     category = "Dynamites";
-  } else if (age > 6 && age <= 8) {
+  } else if (age > 6 && age <= 9) {
     category = "Discoverers";
-  } else if (age > 8 && age <= 10) {
+  } else if (age > 8 && age <= 12) {
     category = "Doers";
   }
 
@@ -58,12 +58,11 @@ const createChildrens = async (req, res, next) => {
     next(error);
   }
 };
-
 // upload excel
 const createChildrensExcell = async (req, res, next) => {
   const key = "children";
-  await req?.body?.data?.map(async (child) => {
-    let age = child?.DOB ? calculateAge(child?.DOB) : null;
+  await req.body.data.map(async (child) => {
+    let age = child.DOB ? calculateAge(child.DOB) : null;
     let category = null;
 
     if (age <= 2) {
@@ -79,23 +78,23 @@ const createChildrensExcell = async (req, res, next) => {
     }
 
     const parents = {
-      parentName: child?.MOTHER_NAME ? child?.MOTHER_NAME : null,
-      parentContact: child?.MOTHER_CONTACT ? child?.MOTHER_CONTACT : null,
-      Relationship: child?.RELATIONSHIP ? child?.RELATIONSHIP : null,
-      fatherName: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
-      fatherContact: child?.FATHER_CONTACT ? child?.FATHER_CONTACT : null,
+      parentName: child.MOTHER_NAME ? child.MOTHER_NAME : null,
+      parentContact: child.MOTHER_CONTACT ? child.MOTHER_CONTACT : null,
+      Relationship: child.RELATIONSHIP ? child.RELATIONSHIP : null,
+      fatherName: child.FATHER_CONTACT ? child.FATHER_CONTACT : null,
+      fatherContact: child.FATHER_CONTACT ? child.FATHER_CONTACT : null,
     };
 
     const newParents = new Parents(parents);
     const savedParents = await newParents.save();
 
     const dataToSave = {
-      childName: child?.CHILD_NAME ? child?.CHILD_NAME : null,
-      childGender: child?.GENDER ? child?.GENDER : null,
-      DOB: child?.DOB ? child?.DOB : null,
+      childName: child.CHILD_NAME ? child.CHILD_NAME : null,
+      childGender: child.GENDER ? child.GENDER : null,
+      DOB: child.DOB ? child.DOB : null,
       childCategory: category,
       visitor: false,
-      ParentsId: savedParents?.id,
+      ParentsId: savedParents.id,
     };
     try {
       const newChildrens = new Childrens(dataToSave);
@@ -119,7 +118,7 @@ const updateChildrens = async (req, res, next) => {
   try {
     const Childrenss = await Childrens.findById(req.params.id);
     if (
-      Childrenss?.attendance?.reduce((accumulator, currentObject) => {
+      Childrenss.attendance.reduce((accumulator, currentObject) => {
         if (currentObject.date === formatDate()) {
           return true;
         } else {
@@ -129,7 +128,7 @@ const updateChildrens = async (req, res, next) => {
     ) {
       Childrens.findOneAndUpdate(
         { _id: req.params.id, "attendance.date": formatDate() },
-        { $set: { "attendance.$.present": attendance?.present } },
+        { $set: { "attendance.$.present": attendance.present } },
         { new: true },
         async (err, updatedDocument) => {
           if (err) next(err);
@@ -155,7 +154,7 @@ const updateChildrens = async (req, res, next) => {
 const updateChild = async (req, res, next) => {
   const key = "children";
   try {
-    let age = req.body?.DOB ? calculateAge(req.body.DOB) : null;
+    let age = req.body.DOB ? calculateAge(req.body.DOB) : null;
     let category = null;
 
     if (age <= 2) {
@@ -170,18 +169,18 @@ const updateChild = async (req, res, next) => {
       category = "Doers";
     }
     const dataToSave = {
-      childName: req?.body?.childName,
-      childGender: req?.body?.childGender,
-      DOB: req?.body?.DOB,
+      childName: req.body.childName,
+      childGender: req.body.childGender,
+      DOB: req.body.DOB,
       childCategory: category,
-      visitor: req?.body?.visitor,
+      visitor: req.body.visitor,
     };
     const parents = {
-      parentName: req?.body?.parentName,
-      parentContact: req?.body?.parentContact,
-      Relationship: req?.body?.Relationship,
-      fatherName: req?.body?.fatherName,
-      fatherContact: req?.body?.fatherContact,
+      parentName: req.body.parentName,
+      parentContact: req.body.parentContact,
+      Relationship: req.body.Relationship,
+      fatherName: req.body.fatherName,
+      fatherContact: req.body.fatherContact,
     };
 
     const child = await Childrens.findByIdAndUpdate(
@@ -191,7 +190,7 @@ const updateChild = async (req, res, next) => {
     );
 
     const UpdatedChild = await Parents.findByIdAndUpdate(
-      child?.ParentsId,
+      child.ParentsId,
       { $set: parents },
       { new: true }
     );
@@ -219,7 +218,7 @@ const getChildrensById = async (req, res, next) => {
     const children = await Childrens.aggregate([
       {
         $match: {
-          _id: ObjectId(req?.params?.id),
+          _id: ObjectId(req.params.id),
         },
       },
       {
@@ -268,7 +267,7 @@ const getByChildName = async (req, res, next) => {
       {
         $match: {
           childName: {
-            $regex: req?.params?.name,
+            $regex: req.params.name,
             $options: "i",
           },
         },
@@ -319,7 +318,21 @@ const getChildrens = async (req, res, next) => {
     let childrenPerPage = parseInt(req.query.limit) || 5;
     let skip = (page - 1) * childrenPerPage;
 
+    let group = req.query.group;
+
+    let condition = {};
+    if (group.toLowerCase() === "all") {
+      // Return all documents
+      condition = {};
+    } else {
+      // Match using the regular expression when "group" is not "all"
+      condition = { childCategory: { $regex: group, $options: "i" } };
+    }
+
     const children = await Childrens.aggregate([
+      {
+        $match: condition,
+      },
       {
         $lookup: {
           from: "parents",
@@ -362,10 +375,10 @@ const getChildrens = async (req, res, next) => {
 //get totals
 const getStats = async (req, res, next) => {
   try {
-    let group = req?.query?.group;
+    let group = req.query.group;
 
     let condition = {};
-    if (group?.toLowerCase() === "all") {
+    if (group.toLowerCase() === "all") {
       // Return all documents
       condition = {};
     } else {
