@@ -71,9 +71,9 @@ const createChildrensExcell = async (req, res, next) => {
       category = "Dreamers";
     } else if (age > 4 && age <= 6) {
       category = "Dynamites";
-    } else if (age > 6 && age <= 8) {
+    } else if (age > 6 && age <= 9) {
       category = "Discoverers";
-    } else if (age > 8 && age <= 10) {
+    } else if (age > 10 && age <= 12) {
       category = "Doers";
     }
 
@@ -163,9 +163,9 @@ const updateChild = async (req, res, next) => {
       category = "Dreamers";
     } else if (age > 4 && age <= 6) {
       category = "Dynamites";
-    } else if (age > 6 && age <= 8) {
+    } else if (age > 6 && age <= 9) {
       category = "Discoverers";
-    } else if (age > 8 && age <= 10) {
+    } else if (age > 10 && age <= 12) {
       category = "Doers";
     }
     const dataToSave = {
