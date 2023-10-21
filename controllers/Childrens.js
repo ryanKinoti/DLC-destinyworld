@@ -362,7 +362,20 @@ const getChildrens = async (req, res, next) => {
 //get totals
 const getStats = async (req, res, next) => {
   try {
+    let group = req?.query?.group;
+
+    let condition = {};
+    if (group?.toLowerCase() === "all") {
+      // Return all documents
+      condition = {};
+    } else {
+      // Match using the regular expression when "group" is not "all"
+      condition = { childCategory: { $regex: group, $options: "i" } };
+    }
     const children = await Childrens.aggregate([
+      {
+        $match: condition,
+      },
       {
         $lookup: {
           from: "parents",
