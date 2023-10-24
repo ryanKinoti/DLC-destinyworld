@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 const Childrens = require("../Models/Childrens");
 const Parents = require("../Models/Parents");
 const { setCache, getCache } = require("../routeCache");
-const { formatDate, calculateAge } = require("../utils/FormatDate");
+const {
+  formatDate,
+  calculateAge,
+  formatDateexcell,
+} = require("../utils/FormatDate");
 const ObjectId = mongoose.Types.ObjectId;
 //CREATE
 const createChildrens = async (req, res, next) => {
@@ -62,7 +66,10 @@ const createChildrens = async (req, res, next) => {
 const createChildrensExcell = async (req, res, next) => {
   const key = "children";
   await req.body.data.map(async (child) => {
-    let age = child.DOB ? calculateAge(child.DOB) : null;
+    let age =
+      child.DOB && calculateAge(formatDateexcell(child.DOB))
+        ? calculateAge(formatDateexcell(child.DOB))
+        : null;
     let category = null;
 
     if (age <= 2) {
@@ -87,11 +94,10 @@ const createChildrensExcell = async (req, res, next) => {
 
     const newParents = new Parents(parents);
     const savedParents = await newParents.save();
-
     const dataToSave = {
       childName: child.CHILD_NAME ? child.CHILD_NAME : null,
       childGender: child.GENDER ? child.GENDER : null,
-      DOB: child.DOB ? child.DOB : null,
+      DOB: child.DOB ? formatDateexcell(child.DOB) : null,
       childCategory: category,
       visitor: false,
       ParentsId: savedParents.id,
@@ -318,7 +324,8 @@ const getChildrens = async (req, res, next) => {
     let childrenPerPage = parseInt(req.query.limit) || 5;
     let skip = (page - 1) * childrenPerPage;
 
-    let group = req.query.group;
+    let namee = req.query.n || "";
+    let group = namee.trim().length !== 0 ? "all" : req.query.group;
 
     let condition = {};
     if (group.toLowerCase() === "all") {
@@ -329,9 +336,21 @@ const getChildrens = async (req, res, next) => {
       condition = { childCategory: { $regex: group, $options: "i" } };
     }
 
+    let namess = {};
+    if (namee.trim().length === 0) {
+      // Return all documents
+      namess = {};
+    } else {
+      // Match using the regular expression when "group" is not "all"
+      namess = { childName: { $regex: namee, $options: "i" } };
+    }
+
     const children = await Childrens.aggregate([
+      // {
+      //   $match: condition,
+      // },
       {
-        $match: condition,
+        $match: { $and: [condition, namess] },
       },
       {
         $lookup: {

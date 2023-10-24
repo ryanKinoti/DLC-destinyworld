@@ -10,7 +10,26 @@ const formatDate = () => {
   return formattedDate;
 };
 
+const formatDateexcell = (dat) => {
+  let date = new Date(dat); // Replace this with your date object
+
+  if (isNaN(date)) {
+    // Check if the date is invalid and return an error message or handle it accordingly
+    return null;
+  }
+  const options = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+
+  let formattedDate = new Intl.DateTimeFormat("en-GB", options)?.format(date);
+  return formattedDate;
+};
 const calculateAge = (birthdateStr) => {
+  if (!birthdateStr) {
+    return null;
+  }
   let birthdate = parseDate(birthdateStr);
   let currentDate = new Date();
 
@@ -29,9 +48,14 @@ const calculateAge = (birthdateStr) => {
 };
 
 function parseDate(dateStr) {
-  let parts = dateStr.split("/");
-  return new Date(parts[2], parts[1] - 1, parts[0]);
+  if (!dateStr) {
+    return null;
+  } else {
+    let parts = dateStr.split("/");
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
 }
 
 exports.formatDate = formatDate;
 exports.calculateAge = calculateAge;
+exports.formatDateexcell = formatDateexcell;
