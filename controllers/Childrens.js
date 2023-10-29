@@ -88,7 +88,7 @@ const createChildrensExcell = async (req, res, next) => {
       parentName: child.MOTHER_NAME ? child.MOTHER_NAME : null,
       parentContact: child.MOTHER_CONTACT ? child.MOTHER_CONTACT : null,
       Relationship: child.RELATIONSHIP ? child.RELATIONSHIP : null,
-      fatherName: child.FATHER_CONTACT ? child.FATHER_CONTACT : null,
+      fatherName: child.FATHER_NAME ? child.FATHER_NAME : null,
       fatherContact: child.FATHER_CONTACT ? child.FATHER_CONTACT : null,
     };
 
