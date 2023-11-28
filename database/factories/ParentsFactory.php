@@ -16,8 +16,15 @@ class ParentsFactory extends Factory
      */
     public function definition(): array
     {
+        $gender = fake()->randomElement(['male', 'female']);
+        $first_name = fake()->firstName($gender);
+        $last_name = fake()->lastName();
+        $com_domain = fake()->randomElement(['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com']);
         return [
-            //
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'email' => strtolower($first_name . '.' . $last_name . '@' . $com_domain),
+            'phone_number' => '+2547' . fake()->randomNumber(8, true),
         ];
     }
 }

@@ -20,9 +20,9 @@ class ChildrenFactory extends Factory
         $gender = fake()->randomElement(['male', 'female']);
 
         return [
-            'class_id' => \Faker\Factory::create()->numberBetween(101, 105),
+            'class_id' => fake()->numberBetween(101, 105),
             'first_name' => fake()->firstName($gender),
-            'last_name' => \Faker\Factory::create()->lastName,
+            'last_name' => fake()->lastName,
             'date_of_birth' => $childDOB->format('Y-m-d'),
             'gender' => $gender,
             'visitor_status' => \Faker\Factory::create()->randomElement(['yes', 'no']),

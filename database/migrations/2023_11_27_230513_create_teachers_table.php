@@ -17,8 +17,8 @@ return new class extends Migration {
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email');
-            $table->string('google_email');
             $table->string('phone_number');
+            $table->enum('gender',['male','female']);
             $table->timestamps();
 
             // Foreign key constraints
