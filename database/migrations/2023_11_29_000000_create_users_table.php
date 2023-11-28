@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -12,8 +13,8 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('teacher_id')->nullable();
-            $table->bigInteger('parent_id')->nullable();
+            $table->bigInteger('teacher_id')->nullable()->unsigned();
+            $table->bigInteger('parent_id')->nullable()->unsigned();
             $table->enum('user_type', ['admin', 'teacher'])->default('teacher');
             $table->string('email')->unique();
             $table->string('google_id')->unique()->nullable();
@@ -24,7 +25,13 @@ return new class extends Migration {
             $table->string('profile_picture')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            // Foreign key constraints
+            $table->foreign('teacher_id')->references('id')->on('teachers');
+            $table->foreign('parent_id')->references('id')->on('parents');
         });
+
+        DB::update("ALTER TABLE users AUTO_INCREMENT = 201;");
     }
 
     /**
