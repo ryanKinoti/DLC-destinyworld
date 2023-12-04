@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\families;
+use App\Models\Family;
 use Illuminate\Http\Request;
 
 class FamiliesController extends Controller
@@ -34,7 +34,7 @@ class FamiliesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(families $families)
+    public function show(Family $families)
     {
         //
     }
@@ -42,7 +42,7 @@ class FamiliesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(families $families)
+    public function edit(Family $families)
     {
         //
     }
@@ -50,7 +50,7 @@ class FamiliesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, families $families)
+    public function update(Request $request, Family $families)
     {
         //
     }
@@ -58,7 +58,7 @@ class FamiliesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(families $families)
+    public function destroy(Family $families)
     {
         //
     }

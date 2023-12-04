@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\children;
+use App\Models\Child;
+use Database\Factories\ChildrenFactory;
 use Illuminate\Database\Seeder;
 
 class ChildrenSeeder extends Seeder
@@ -13,6 +14,6 @@ class ChildrenSeeder extends Seeder
     public function run(): void
     {
         $numberOfChildren = 500;
-        children::factory()->count($numberOfChildren)->create();
+        Child::factory()->count($numberOfChildren)->create();
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('registers', function (Blueprint $table) {
+        Schema::create('register', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('class_id')->nullable()->unsigned();
             $table->bigInteger('child_id')->nullable()->unsigned();
@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->foreign('child_id')->references('id')->on('children');
         });
 
-        DB::update("ALTER TABLE registers AUTO_INCREMENT = 101;");
+        DB::update("ALTER TABLE register AUTO_INCREMENT = 101;");
     }
 
     /**

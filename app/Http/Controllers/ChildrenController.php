@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\children;
+use App\Models\Child;
 use Illuminate\Http\Request;
 
 class ChildrenController extends Controller
@@ -34,7 +34,7 @@ class ChildrenController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(children $children)
+    public function show(Child $children)
     {
         //
     }
@@ -42,7 +42,7 @@ class ChildrenController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(children $children)
+    public function edit(Child $children)
     {
         //
     }
@@ -50,7 +50,7 @@ class ChildrenController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, children $children)
+    public function update(Request $request, Child $children)
     {
         //
     }
@@ -58,7 +58,7 @@ class ChildrenController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(children $children)
+    public function destroy(Child $children)
     {
         //
     }

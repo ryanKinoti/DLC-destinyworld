@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\teachers;
+use App\Models\teacher;
 use Illuminate\Database\Seeder;
 
 class TeacherSeeder extends Seeder
@@ -13,6 +13,6 @@ class TeacherSeeder extends Seeder
     public function run(): void
     {
         $numberOfTeachers = 20;
-        teachers::factory()->count($numberOfTeachers)->create();
+        Teacher::factory()->count($numberOfTeachers)->create();
     }
 }

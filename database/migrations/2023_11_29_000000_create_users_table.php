@@ -15,7 +15,8 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('teacher_id')->nullable()->unsigned();
             $table->bigInteger('parent_id')->nullable()->unsigned();
-            $table->enum('user_type', ['admin', 'teacher'])->default('teacher');
+
+            $table->enum('user_type', ['super_admin','admin', 'teacher'])->default('teacher');
             $table->string('email')->unique();
             $table->string('google_id')->unique()->nullable();
             $table->enum('account_status', ['active', 'inactive'])->default('inactive');

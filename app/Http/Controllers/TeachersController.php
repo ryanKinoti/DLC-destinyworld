@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\teachers;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class TeachersController extends Controller
@@ -34,7 +34,7 @@ class TeachersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(teachers $teachers)
+    public function show(Teacher $teachers)
     {
         //
     }
@@ -42,7 +42,7 @@ class TeachersController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(teachers $teachers)
+    public function edit(Teacher $teachers)
     {
         //
     }
@@ -50,7 +50,7 @@ class TeachersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, teachers $teachers)
+    public function update(Request $request, teacher $teachers)
     {
         //
     }
@@ -58,7 +58,7 @@ class TeachersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(teachers $teachers)
+    public function destroy(teacher $teachers)
     {
         //
     }
